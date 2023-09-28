@@ -16,13 +16,15 @@ var Dat_e = ` ${today.getDate()} / ${today.getMonth()+1} / ${today.getFullYear()
 
 document.querySelector('.date span').innerHTML = Dat_e;
 
+let d = ` ${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} `
+
 // جلب قائمة مباريات اليوم
 
-fetch('https://apiv2.allsportsapi.com/football/?met=Livescore&APIkey='+APIkey)
+fetch('https://apiv2.allsportsapi.com/football/?met=Fixtures&APIkey='+APIkey+'&timezone=Africa/Algiers&from='+d+'&to='+d)
 .then(res=>res.json())
 .then(res=>{
   let match = res.result;
-  let country = match.filter(i => i.country_name != "Israel").map(i => i.country_name) // تحديد دول مقام فيها مباريات
+  let country = match.filter(i => i.country_name != "Israel" ).map(i => i.country_name) // تحديد دول مقام فيها مباريات
   // ارجاع  دول بدون تكرار
     country = [...new Set(country)]
 
@@ -32,7 +34,7 @@ fetch('https://apiv2.allsportsapi.com/football/?met=Livescore&APIkey='+APIkey)
   let m  = ""
   for(let i=0;i<match.length;i++){
     m  += `<div class="box" data-country="${match[i].country_name}" data-id="${match[i].event_key}">
-              <p>${match[i].event_status}</p>
+              <p>${match[i].event_status ? match[i].event_status : match[i].event_time}</p>
               <p><img src="${match[i].away_team_logo}" class="logo" alt="-"> ${match[i].event_away_team}</p>
               <p style="direction: rtl;">${match[i].event_final_result}</p>
               <p><img src="${match[i].home_team_logo}" class="logo" alt="-">${match[i].event_home_team}</p>
@@ -44,9 +46,18 @@ fetch('https://apiv2.allsportsapi.com/football/?met=Livescore&APIkey='+APIkey)
 let optionSelect = document.querySelector("#country");
 let arrBoxMatch = document.querySelectorAll(".match .box")
 
+if(localStorage.getItem('country')){
+  showMatch(localStorage.getItem('country') , arrBoxMatch)
+  optionSelect.value = localStorage.getItem('country') 
+
+}else{
 showMatch(optionSelect.value , arrBoxMatch)
+
+}
+
 optionSelect.onchange = () => {
   showMatch(optionSelect.value , arrBoxMatch)
+  localStorage.setItem('country',optionSelect.value)
 }
 
 showDetails(arrBoxMatch ,match);
@@ -101,16 +112,17 @@ function showDetails(arr , arrMatch){
       let boxCardsB = match.cards.filter(i => i.home_fault.length <= 0 ).map(i=>`<p> ${i.time} <span>${i.away_fault}</span> <span class="${i.card}"></span></p>`)
 
       // الاهداف
-      let boxGolA = match.goalscorers.filter(i=>i.home_scorer.length > 0).map(i=>`<p> ${i.time} <span>${i.home_scorer}</span>  <span style="background: white;width: 25px;height: 25px;display: inline-block;border-radius: 50%;"><img src="football.png"width="25" height="25"></span></p>`)
-      let boxGolB = match.goalscorers.filter(i=>i.home_scorer.length <= 0).map(i=>`<p> ${i.time} <span>${i.away_scorer}</span> <span style="background: white;width: 25px;height: 25px;display: inline-block;border-radius: 50%;"><img src="football.png" width="25" height="25"/> <span></p>`)
+      let boxGolA = match.goalscorers.filter(i=>i.home_scorer.length > 0).map(i=>`<p> ${i.time} <span>${i.home_scorer}</span>  <span style="background: white;width: 15px;height: 15px;display: inline-block;border-radius: 50%;"><img src="football.png"width="15" height="15"></span></p>`)
+      let boxGolB = match.goalscorers.filter(i=>i.home_scorer.length <= 0).map(i=>`<p> ${i.time} <span>${i.away_scorer}</span> <span style="background: white;width: 15px;height: 15px;display: inline-block;border-radius: 50%;"><img src="football.png" width="15" height="15"/> <span></p>`)
 
       document.querySelector('.container').innerHTML +=`
       <div class="box-match">
         <div class="match-details">
-        <div class="close"><a href="index.html">X</a></div>
+        <div class="close"><a href='index.html'>X</a></div>
+        <div style="    max-height: 500px;overflow-y: auto;  padding: 20px;  position: relative;        overflow-x: hidden;">
           <div class="header">
           <img src=${match.country_logo} class="country">
-          ${match.league_logo?`<img src="${match.league_logo}" class="leaguelogo">` : ""}
+          ${match.league_logo?`<div style="background: var(--main-color);border-radius: 6px;margin: 55px 0 10px 0;display: flex;align-items: center;justify-content: center;"><img src="${match.league_logo}" class="leaguelogo"></div>` : ""}
           <p>${match.league_name}</p>
           <div class="box" data-country="${match.country_name}" data-id="${match.event_key}">
               <p>${match.event_status}</p>
@@ -144,11 +156,10 @@ function showDetails(arr , arrMatch){
           </p>
           </div>
           </div>
+          </div>
         </div>
       </div>
       `
     }
   })
 }
-
-
