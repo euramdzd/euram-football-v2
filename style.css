@@ -126,27 +126,25 @@ select{
   width: 600px;
   margin: auto;
   max-width: calc(100%);
-  max-height: 500px;
-  padding: 20px;
   position: relative;
-  overflow-y: auto;
-  overflow-x: hidden;
-
   border-radius: 6px;
   background-color: #040d17;
   color: white !important;
 }
+
 .close a{
   padding: 6px;
   color: white !important;
   font-size: 18px;
   text-decoration: none;
-  right: 4px;
+  right: 25px;
   top: 4px;
+  z-index: 88;
   position: absolute;
 }
 .box-match .leaguelogo{
-  width: 65px;
+  width: 75px;
+  padding: 5px;
 }
 .box-match .country{
   position: absolute;
@@ -196,6 +194,9 @@ select{
   margin: 8px 0;
 
 }
+.match-details .stats{
+  margin: 30px 0;
+}
 .match-details .infomatch p span{
   color: white;
   display: block;
@@ -212,7 +213,10 @@ select{
     gap: 5px;
   }
   *{
-    font-size: 14px;
+    font-size: 11px !important;
+  }
+  .close a{
+    font-size: 16px !important;
   }
   .match-details .stats {
     margin: 25px 0;
